@@ -62,9 +62,9 @@ public:
             InitialPowerUsage = CurrentUsage;
         }
 
-        auto _1 = (KValue * InitialPowerUsage) / 10000.f; //scaled_power_ratio
-        auto _2 = (1.f - Shards/3.f) * FMath::Pow(ClockSpeed, DValue); //shard_coefficient
-        auto _3 = (InitialPowerUsage * KValue * ClockSpeed) / 100.f; //linear_power_slope
+        auto _1 = KValue * InitialPowerUsage;
+        auto _2 = (1.f - Shards/3.f) * FMath::Pow(ClockSpeed, DValue);
+        auto _3 = InitialPowerUsage * KValue * ClockSpeed;
 
         auto OutputValue = FMath::Max(0.1f, _1 * _2 + _3);
 
