@@ -1,0 +1,33 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.7",
+	"FriendlyName": "BetterOverclocking",
+	"Description": "",
+	"Category": "Modding",
+	"CreatedBy": "Sam Crosscat",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "BetterOverclocking",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "SML",
+			"Enabled": true,
+			"SemVersion": "^3.8.0"
+		}
+	],
+	"SemVersion": "1.0.7",
+	"GameVersion": ">=382498"
+}
