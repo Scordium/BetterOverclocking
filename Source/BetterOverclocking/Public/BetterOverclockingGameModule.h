@@ -2,6 +2,7 @@
 
 #include "FGInventoryComponent.h"
 #include "FGPowerInfoComponent.h"
+#include "FGPowerShardDescriptor.h"
 #include "ModConfig_BetterOverclockingStruct.h"
 #include "Buildables/FGBuildableFactory.h"
 #include "Buildables/FGBuildableManufacturerVariablePower.h"
@@ -17,8 +18,6 @@ class UBetterOverclockingGameModule : public UGameWorldModule
 
 public:
 
-    UBetterOverclockingGameModule() { bRootModule = true; }
-
     virtual void DispatchLifecycleEvent(ELifecyclePhase Phase) override;
 
     virtual void BeginDestroy() override
@@ -27,22 +26,28 @@ public:
         Super::BeginDestroy();
     }
 
-    UFUNCTION(BlueprintCallable)
-    void SetKValue() { KValue = FModConfig_BetterOverclockingStruct::GetActiveConfig(this).K_Value; }
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+    TSubclassOf<UFGPowerShardDescriptor> PowerShardDescriptor;
+
+    UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+    TSubclassOf<UFGPowerShardDescriptor> SomersloopDescriptor;
 
     UFUNCTION(BlueprintCallable)
-    void SetDValue() { DValue = FModConfig_BetterOverclockingStruct::GetActiveConfig(this).D_Value; }
+    void SetOverclockModifierValue() { OverclockModifier = FModConfig_BetterOverclockingStruct::GetActiveConfig(this).OverclockModifier; }
+
+    UFUNCTION(BlueprintCallable)
+    void SetOverclockExponentValue() { OverclockExponent = FModConfig_BetterOverclockingStruct::GetActiveConfig(this).OverclockExponent; }
     
-    static inline float KValue = 1;
-    static inline float DValue = 2;
+    static inline float OverclockModifier = 1;
+    static inline float OverclockExponent = 2;
     
     FDelegateHandle OverclockDelegate;
 
-    static float CalculatePowerUsage(const AFGBuildableFactory* Object)
+    float CalculatePowerUsage(const AFGBuildableFactory* Object)
     {
         const auto ShardInventory = Object->GetPotentialInventory();
         
-        const auto Shards = ShardInventory->GetNumItems(nullptr);
+        const auto Shards = ShardInventory->GetNumItems(PowerShardDescriptor);
         const auto ClockSpeed = Object->GetCurrentPotential();
         float InitialPowerUsage = Object->mPowerConsumption;
 
@@ -61,12 +66,13 @@ public:
 
             InitialPowerUsage = CurrentUsage;
         }
+        
+        float SomersloopPowerMultiplier = FMath::Pow(Object->GetCurrentProductionBoost(), 2);
 
-        auto _1 = KValue * InitialPowerUsage;
-        auto _2 = (1.f - Shards/3.f) * FMath::Pow(ClockSpeed, DValue);
-        auto _3 = InitialPowerUsage * KValue * ClockSpeed;
+        auto _1 = OverclockModifier * SomersloopPowerMultiplier * InitialPowerUsage;
+        auto _2 = (1.f - Shards/3.f) * FMath::Pow(ClockSpeed, OverclockExponent) + ClockSpeed;
 
-        auto OutputValue = FMath::Max(0.1f, _1 * _2 + _3);
+        auto OutputValue = FMath::Max(0.1f, _1 * _2);
 
         //Update power usage (required on load since machines don't update their consumption unless overclock was changed)
         auto PowerConnector = Object->GetPowerInfo();

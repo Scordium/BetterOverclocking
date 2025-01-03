@@ -10,10 +10,10 @@ struct FModConfig_BetterOverclockingStruct {
     GENERATED_BODY()
 public:
     UPROPERTY(BlueprintReadWrite)
-    float K_Value{};
+    float OverclockModifier{};
 
     UPROPERTY(BlueprintReadWrite)
-    float D_Value{};
+    float OverclockExponent{};
 
     /* Retrieves active configuration value and returns object of this struct containing it */
     static FModConfig_BetterOverclockingStruct GetActiveConfig(UObject* WorldContext) {
