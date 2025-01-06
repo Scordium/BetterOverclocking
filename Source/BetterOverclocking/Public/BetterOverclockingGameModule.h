@@ -49,6 +49,8 @@ public:
         
         const auto Shards = ShardInventory->GetNumItems(PowerShardDescriptor);
         const auto ClockSpeed = Object->GetCurrentPotential();
+        EProductionStatus status = Object->GetProductionIndicatorStatus();
+        const uint8 isNotStandby = (status == EProductionStatus::IS_STANDBY) ? 0 : 1;
         float InitialPowerUsage = Object->mPowerConsumption;
 
         
@@ -69,7 +71,7 @@ public:
         
         float SomersloopPowerMultiplier = FMath::Pow(Object->GetCurrentProductionBoost(), 2);
 
-        auto _1 = OverclockModifier * SomersloopPowerMultiplier * InitialPowerUsage;
+        auto _1 = OverclockModifier * SomersloopPowerMultiplier * InitialPowerUsage * isNotStandby;
         auto _2 = (1.f - Shards/3.f) * FMath::Pow(ClockSpeed, OverclockExponent) + ClockSpeed;
 
         auto OutputValue = FMath::Max(0.1f, _1 * _2);
