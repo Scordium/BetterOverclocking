@@ -45,8 +45,9 @@ public:
 
     float CalculatePowerUsage(const AFGBuildableFactory* Object)
     {
+        if (Object->GetProductionIndicatorStatus() == EProductionStatus::IS_STANDBY) return 0.1f;
+
         const auto ShardInventory = Object->GetPotentialInventory();
-        
         const auto Shards = ShardInventory->GetNumItems(PowerShardDescriptor);
         const auto ClockSpeed = Object->GetCurrentPotential();
         float InitialPowerUsage = Object->mPowerConsumption;
